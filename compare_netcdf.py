@@ -18,10 +18,10 @@ def main(file1, file2):
             difference = (ds[1].variables[vname].values - ds[0].variables[vname].values)
             average = (ds[1].variables[vname].values + ds[0].variables[vname].values) / 2
             fractional_difference = numpy.where(average > 0, difference / average, 0)
-            if difference.max() > 0:
+            if abs(difference).max() > 0:
                 print(
                     'Variable %s differs (max difference: %e; %f%%)'%(
-                        vname, difference.max(), 100.0 * fractional_difference.max()
+                        vname, abs(difference).max(), 100.0 * fractional_difference.max()
                     )
                 )
         except:
