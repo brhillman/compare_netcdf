@@ -14,18 +14,28 @@ def main(file1, file2):
 
     # loop over variables and check for differences
     for vname in ds[0].variables.keys():
-        try:
-            difference = (ds[1].variables[vname].values - ds[0].variables[vname].values)
-            average = (ds[1].variables[vname].values + ds[0].variables[vname].values) / 2
-            fractional_difference = numpy.where(average > 0, difference / average, 0)
+       try:
+            # Calculate absolute difference
+            difference = abs(ds[1].variables[vname].values - ds[0].variables[vname].values)
+
+            # Calculate fractional difference
+            average = abs(ds[1].variables[vname].values + ds[0].variables[vname].values) / 2
+            if numpy.any((difference > 0) & (average > 0)):
+                fractional_difference = numpy.where(
+                    (average > 0) & (difference > 0), difference / average, 0
+                )
+            else:
+                fractional_difference = numpy.zeros(1)
+
+            # Report differences
             if abs(difference).max() > 0:
                 print(
                     'Variable %s differs (max difference: %e; %f%%)'%(
                         vname, abs(difference).max(), 100.0 * fractional_difference.max()
                     )
                 )
-        except:
-            print('Processing for variable %s failed.'%vname)
+       except:
+           print('Processing for variable %s failed.'%vname)
 
     # close datasets
     for d in ds: d.close()
