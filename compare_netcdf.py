@@ -2,6 +2,7 @@
 
 def main(file1, file2):
     import numpy
+    from termcolor import colored
 
     # open datasets
     from xarray import open_dataset
@@ -14,7 +15,7 @@ def main(file1, file2):
         if dname in ds[1].dims:
             number_dimensions += 1
             if ds[1].dims[dname] != ds[0].dims[dname]:
-                print('Dimension %s differs')
+                print(colored('Dimension %s differs', 'red'))
                 number_dimension_diffs += 1
         else:
             print('Warning: %s is not present in both datasets.'%dname)
@@ -40,11 +41,11 @@ def main(file1, file2):
 
                 # Report differences
                 if abs(difference).max() > 0:
-                    print(
+                    print(colored(
                         'Variable %s differs (max difference: %e; %f%%)'%(
                             vname, abs(difference).max(), 100.0 * fractional_difference.max()
-                        )
-                    )
+                        ), 'red'
+                    ))
                     number_variable_diffs += 1
             except:
                 print('Processing for variable %s failed.'%vname)
@@ -57,6 +58,13 @@ def main(file1, file2):
     # Report summaries
     print('Found differences in %i out of %i processed dimensions.'%(number_dimension_diffs, number_dimensions))
     print('Found differences in %i out of %i processed variables.'%(number_variable_diffs, number_variables))
+
+    if number_dimension_diffs == 0 and number_variable_diffs == 0:
+        result = colored('PASS', 'green')
+    else:
+        result = colored('FAIL', 'red')
+    print('Result: ', result)
+
 
 if __name__ == '__main__':
     import plac
